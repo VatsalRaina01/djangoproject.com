@@ -169,13 +169,13 @@ class UserProfileTests(TracDBCreateDatabaseMixin, ReleaseMixin, TestCase):
         }
     )
     def test_caches_trac_stats(self):
-        key = "user_vital_status:%s" % hashlib.md5(b"user1").hexdigest()
+        cache_key = "user_vital_status:%s" % hashlib.md5(b"user1").hexdigest()
 
-        self.assertIsNone(cache.get(key))
+        self.assertIsNone(cache.get(cache_key))
 
         self.client.get(self.user1_url)
 
-        self.assertIsNotNone(cache.get(key))
+        self.assertIsNotNone(cache.get(cache_key))
 
 
 class ViewsTests(ReleaseMixin, TestCase):
@@ -320,3 +320,8 @@ class RegistrationTests(ReleaseMixin, TestCase):
     def test_captcha_widget_is_rendered(self):
         response = self.client.get(reverse("registration_register"))
         self.assertContains(response, "g-recaptcha")
+
+    def test_autocomplete_attributes(self):
+        form = RegistrationFormWithCaptcha()
+        self.assertEqual(form.fields["username"].widget.attrs.get("autocomplete"), "username")
+        self.assertEqual(form.fields["email"].widget.attrs.get("autocomplete"), "email")
