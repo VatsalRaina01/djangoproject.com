@@ -19,6 +19,11 @@ class RegistrationFormWithCaptcha(RegistrationFormUniqueEmail):
 
     captcha = ReCaptchaField(widget=ReCaptchaV3)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["username"].widget.attrs["autocomplete"] = "username"
+        self.fields["email"].widget.attrs["autocomplete"] = "email"
+
 
 class ProfileForm(forms.ModelForm):
     """
@@ -97,7 +102,7 @@ class DeleteProfileForm(forms.Form):
 
         try:
             self.user.delete()
-        except ProtectedError as e:
-            self.add_errors_from_protectederror(e)
+        except ProtectedError as err:
+            self.add_errors_from_protectederror(err)
             return None
         return self.user
